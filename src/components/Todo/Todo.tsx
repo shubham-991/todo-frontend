@@ -5,7 +5,6 @@
   import './Todo.css';
   import Taskform from '../Taskform/Taskform';
   import Task from '../Task/Task';
-  import tasksData from '../../tasks.json';
   import TaskBoard from '../TaskBoard/TaskBoard';
   import { DndProvider } from 'react-dnd';
   import { HTML5Backend } from 'react-dnd-html5-backend';

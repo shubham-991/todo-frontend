@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "name": "Buy groceries",
+    "description": "Buy milk, bread, and eggs",
+    "completed": false
+  },
+  {
+    "id": 2,
+    "name": "Finish project",
+    "description": "Complete the remaining tasks for the project",
+    "completed": false
+  },
+  {
+    "id": 3,
+    "name": "Call mom",
+    "description": "Call mom to check in and say hi",
+    "completed": true
+  },
+  {
+    "id": 4,
+    "name": "Clean house",
+    "description": "Do the laundry, clean the kitchen, and vacuum the carpets",
+    "completed": false
+  },
+  {
+    "id": 5,
+    "name": "Go for a run",
+    "description": "Jog around the park for 30 minutes",
+    "completed": true
+  },
+  {
+    "id": 6,
+    "name": "Read a book",
+    "description": "Read for an hour before bed",
+    "completed": false
+  },
+  {
+    "id": 7,
+    "name": "Write a blog post",
+    "description": "Write a blog post about your recent trip",
+    "completed": false
+  },
+  {
+    "id": 8,
+    "name": "Practice guitar",
+    "description": "Practice guitar for 30 minutes",
+    "completed": true
+  },
+  {
+    "id": 9,
+    "name": "Plan vacation",
+    "description": "Research and plan a vacation for next year",
+    "completed": false
+  },
+  {
+    "id": 10,
+    "name": "Do yoga",
+    "description": "Stretch and do yoga poses for 20 minutes",
+    "completed": true
+  }
+]
