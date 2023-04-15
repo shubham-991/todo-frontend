@@ -1,0 +1,55 @@
+/* src/components/TaskForm/TaskForm.css */
+.task-form-container {
+    margin: 2rem;
+}
+
+.task-form {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.form-control {
+    flex-grow: 1;
+    padding: 0.5rem;
+    font-size: 1rem;
+    /* border: 1px solid #ccc; */
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+
+    width: 300px;
+    /* Add this line to ensure both fields have the same width */
+}
+
+.submit-btn {
+    background-color: #1A237E;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background-color: #0069d9;
+}
+
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 12px;
+    background-color: #1A237E;
+    color: #fff;
+    border-radius: 4px;
+    z-index: 999;
+    opacity: 0.8;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.popup.show {
+    opacity: 1;
+}
