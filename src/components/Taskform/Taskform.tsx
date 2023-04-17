@@ -3,6 +3,8 @@ import './Taskform.css';
 import axios from 'axios';
 import { TaskData } from '../types';
 import Spinner from '../Spinner/Spinner';
+const API_URL = process.env.REACT_APP_API_URL;
+
 
 interface TaskFormProps {
   addNewTask: (newTask: TaskData) => void;
@@ -18,7 +20,7 @@ const Taskform: React.FC<TaskFormProps> = ({ addNewTask }) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await axios.post('/api/todos', {
+      const response = await axios.post(`${API_URL}/api/todos`, {
         name,
         description
       }, {

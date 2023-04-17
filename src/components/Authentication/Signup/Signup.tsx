@@ -3,6 +3,8 @@ import axios from 'axios';
 import './Signup.css';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../../Spinner/Spinner';
+const API_URL = process.env.REACT_APP_API_URL;
+
 
 const Signup: React.FC = () => {
   const [name, setName] = useState('');
@@ -16,7 +18,7 @@ const Signup: React.FC = () => {
     event.preventDefault();
     setShowSpinner(true); 
     try {
-      const {data} = await axios.post<{ token: string }>('/api/auth/signup', {
+      const {data} = await axios.post<{ token: string }>(`${API_URL}/api/auth/signup`, {
         name,
         email,
         password,

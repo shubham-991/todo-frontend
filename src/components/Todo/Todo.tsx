@@ -3,13 +3,9 @@
   import Navbar from '../Navbar/Navbar';
   // import Task from '../Task/Task';
   import './Todo.css';
-  import Taskform from '../Taskform/Taskform';
-  import Task from '../Task/Task';
   import TaskBoard from '../TaskBoard/TaskBoard';
   import { DndProvider } from 'react-dnd';
   import { HTML5Backend } from 'react-dnd-html5-backend';
-
-
 
   const Todo: React.FC = () => {
     return (

@@ -3,6 +3,7 @@ import axios from 'axios';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../../Spinner/Spinner';
+const API_URL = process.env.REACT_APP_API_URL;
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -15,7 +16,8 @@ const Login: React.FC = () => {
     event.preventDefault();
     setShowSpinner(true);
     try {
-      const {data} = await axios.post('https://todo-backend-shubham-991.onrender.com/api/auth/login', {
+      console.log(API_URL);
+      const {data} = await axios.post(`${API_URL}/api/auth/login`, {
         email,
         password,
       });

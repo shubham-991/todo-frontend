@@ -7,6 +7,9 @@ import './TaskBoard.css';
 import { TaskData } from '../types';
 import TaskForm from '../Taskform/Taskform';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
+
 interface DragItem {
   id: string;
   type: 'task';
@@ -26,7 +29,7 @@ const TaskBoard: React.FC = () => {
   useEffect(() => {
     const fetchTodos = async () => {
       try {
-        const response = await axios.get<TaskData[]>('/api/todos', {
+        const response = await axios.get<TaskData[]>(`${API_URL}/api/todos`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -45,7 +48,7 @@ const TaskBoard: React.FC = () => {
     if (task) {
       const updatedTask = { ...task, isCompleted: isOverCompleted };
       const response = await axios.put<TaskData>(
-        `/api/todos/${taskId}`,
+        `${API_URL}/api/todos/${taskId}`,
         updatedTask,
         {
           headers: {
@@ -64,7 +67,7 @@ const TaskBoard: React.FC = () => {
 
   const handleDelete = async (taskId: string) => {
     try {
-      await axios.delete(`/api/todos/${taskId}`, {
+      await axios.delete(`${API_URL}/api/todos/${taskId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -82,7 +85,7 @@ const TaskBoard: React.FC = () => {
     if (task) {
       const updatedTask = { ...task, isCompleted: true };
       const response = await axios.put<TaskData>(
-        `/api/todos/${taskId}`,
+        `${API_URL}/api/todos/${taskId}`,
         updatedTask,
         {
           headers: {
@@ -98,7 +101,7 @@ const TaskBoard: React.FC = () => {
   const handleEditClick = async (updatedTask: TaskData) => {
   try {
     const response = await axios.put<TaskData>(
-      `/api/todos/${updatedTask._id}`,
+      `${API_URL}/api/todos/${updatedTask._id}`,
       updatedTask,
       {
         headers: {
