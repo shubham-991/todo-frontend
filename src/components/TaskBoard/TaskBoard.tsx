@@ -1,57 +1,118 @@
-import React, { useEffect, useState, useContext } from 'react';
-import axios from 'axios';
-import {useDrop} from 'react-dnd';
-import Task from '../Task/Task';
-import './TaskBoard.css';
-import { TaskData } from '../types';
-import TaskForm from '../Taskform/Taskform';
-import { UserContext } from '../../Context/UserContext';
-const API_URL = process.env.REACT_APP_API_URL;
+  import React, { useEffect, useState, useContext } from 'react';
+  import axios from 'axios';
+  import {useDrop} from 'react-dnd';
+  import Task from '../Task/Task';
+  import './TaskBoard.css';
+  import { TaskData } from '../types';
+  import TaskForm from '../Taskform/Taskform';
+  import { UserContext } from '../../Context/UserContext';
+  const API_URL = process.env.REACT_APP_API_URL;
 
 
-interface DragItem {
-  id: string;
-  type: 'task';
-}
+  interface DragItem {
+    id: string;
+    type: 'task';
+  }
 
-const TaskBoard: React.FC = () => {
-  const [todos, setTodos] = useState<TaskData[]>([]);
-  const [error, setError] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const {user} = useContext(UserContext);
+  const TaskBoard: React.FC = () => {
+    const [todos, setTodos] = useState<TaskData[]>([]);
+    const [error, setError] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const {user} = useContext(UserContext);
 
-  const addNewTask = (newTask: TaskData) => {
-  setTodos((prevTodos) => [newTask, ...prevTodos]);
-  };
+    const addNewTask = (newTask: TaskData) => {
+    setTodos((prevTodos) => [newTask, ...prevTodos]);
+    };
 
-  const fetchTodos = async () => {
-    if(user && user.token){
-      try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        };
-        
-        const response = await axios.get<TaskData[]>(`${API_URL}/api/todos`, config);
-        setTodos(response.data);
-      } catch (error) {
-        console.error(error);
-        setError('Failed to fetch todos.');
+    const fetchTodos = async () => {
+      if(user && user.token){
+        try {
+          const config = {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          };
+          
+          const response = await axios.get<TaskData[]>(`${API_URL}/api/todos`, config);
+          setTodos(response.data);
+        } catch (error) {
+          console.error(error);
+          setError('Failed to fetch todos.');
+        }
+      }else {
+    // Wait for the token to be available before making the request
+    const tokenCheckInterval = setInterval(() => {
+      if (user && user.token) {
+        clearInterval(tokenCheckInterval);
+        fetchTodos();
       }
+    }, 100);
+  }
+      };
+
+    useEffect(() => {
+      fetchTodos();
+    }, [user]);
+
+    const handleDrop = async (taskId: string, targetColumn: 'todo' | 'completed') => {
+      const task = todos.find((t) => t._id === taskId);
+      if (task) {
+        const updatedTask = { ...task, isCompleted: targetColumn === 'completed' };
+        const response = await axios.put<TaskData>(
+          `${API_URL}/api/todos/${taskId}`,
+          updatedTask,
+          {
+            headers: {
+              Authorization: `Bearer ${user?.token}`,
+            },
+          }
+        );
+        const newTodos = todos.map((t) => (t._id === taskId ? response.data : t));
+        setTodos(newTodos);
       }
     };
 
-  useEffect(() => {
-    fetchTodos();
-  }, [user]);
+    const handleModalClose = () => {
+      setShowModal(false);
+    };
 
-  const handleDrop = async (taskId: string, targetColumn: 'todo' | 'completed') => {
-    const task = todos.find((t) => t._id === taskId);
-    if (task) {
-      const updatedTask = { ...task, isCompleted: targetColumn === 'completed' };
+    const handleDelete = async (taskId: string) => {
+      try {
+        await axios.delete(`${API_URL}/api/todos/${taskId}`, {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+          },
+        });
+        const newTodos = todos.filter((task) => task._id !== taskId);
+        setTodos(newTodos);
+      } catch (error) {
+        console.error(error);
+        setError('Failed to delete task.');
+      }
+    };
+
+    const handleCompleteClick = async (taskId: string) => {
+      const task = todos.find((t) => t._id === taskId);
+      if (task) {
+        const updatedTask = { ...task, isCompleted: true };
+        const response = await axios.put<TaskData>(
+          `${API_URL}/api/todos/${taskId}`,
+          updatedTask,
+          {
+            headers: {
+              Authorization: `Bearer ${user?.token}`,
+            },
+          }
+        );
+        const newTodos = todos.map((t) => (t._id === taskId ? response.data : t));
+        setTodos(newTodos);
+      }
+    };
+
+    const handleEditClick = async (updatedTask: TaskData) => {
+    try {
       const response = await axios.put<TaskData>(
-        `${API_URL}/api/todos/${taskId}`,
+        `${API_URL}/api/todos/${updatedTask._id}`,
         updatedTask,
         {
           headers: {
@@ -59,136 +120,83 @@ const TaskBoard: React.FC = () => {
           },
         }
       );
-      const newTodos = todos.map((t) => (t._id === taskId ? response.data : t));
-      setTodos(newTodos);
-    }
-  };
-
-  const handleModalClose = () => {
-    setShowModal(false);
-  };
-
-  const handleDelete = async (taskId: string) => {
-    try {
-      await axios.delete(`${API_URL}/api/todos/${taskId}`, {
-        headers: {
-          Authorization: `Bearer ${user?.token}`,
-        },
-      });
-      const newTodos = todos.filter((task) => task._id !== taskId);
+      const newTodos = todos.map((t) => (t._id === updatedTask._id ? response.data : t));
       setTodos(newTodos);
     } catch (error) {
       console.error(error);
-      setError('Failed to delete task.');
+      setError('Failed to update task.');
     }
   };
 
-  const handleCompleteClick = async (taskId: string) => {
-    const task = todos.find((t) => t._id === taskId);
-    if (task) {
-      const updatedTask = { ...task, isCompleted: true };
-      const response = await axios.put<TaskData>(
-        `${API_URL}/api/todos/${taskId}`,
-        updatedTask,
-        {
-          headers: {
-            Authorization: `Bearer ${user?.token}`,
-          },
-        }
-      );
-      const newTodos = todos.map((t) => (t._id === taskId ? response.data : t));
-      setTodos(newTodos);
-    }
-  };
+  const [{ isOver: isOverTodo }, todoDrop] = useDrop({
+      accept: 'task',
+      drop: (item: DragItem) => {
+        handleDrop(item.id, 'todo');
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+      }),
+    });
 
-  const handleEditClick = async (updatedTask: TaskData) => {
-  try {
-    const response = await axios.put<TaskData>(
-      `${API_URL}/api/todos/${updatedTask._id}`,
-      updatedTask,
-      {
-        headers: {
-          Authorization: `Bearer ${user?.token}`,
-        },
-      }
-    );
-    const newTodos = todos.map((t) => (t._id === updatedTask._id ? response.data : t));
-    setTodos(newTodos);
-  } catch (error) {
-    console.error(error);
-    setError('Failed to update task.');
-  }
-};
+    const [{ isOver: isOverCompleted }, completedDrop] = useDrop({
+      accept: 'task',
+      drop: (item: DragItem) => {
+        handleDrop(item.id, 'completed');
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+      }),
+    });
 
- const [{ isOver: isOverTodo }, todoDrop] = useDrop({
-    accept: 'task',
-    drop: (item: DragItem) => {
-      handleDrop(item.id, 'todo');
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-    }),
-  });
+    const completedTasks = todos.filter((task) => task.isCompleted);
+    const todoTasks = todos.filter((task) => !task.isCompleted);
 
-  const [{ isOver: isOverCompleted }, completedDrop] = useDrop({
-    accept: 'task',
-    drop: (item: DragItem) => {
-      handleDrop(item.id, 'completed');
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-    }),
-  });
+    return (
+      <>
+        <TaskForm addNewTask={addNewTask} />
+        
+          <div className="task-board">
+          <div ref={todoDrop} className={`task-column ${isOverTodo ? 'over' : ''}`}>  
+              <h2 className="task-column-title">Todo</h2>
+              <ul className="task-list">
+                {error && <div className="error">{error}</div>}
+                {todoTasks.map((task) => (
+                  <li key={task._id}>
+                    <Task
+                      task={task}
+                      onDelete={handleDelete}
+                      onComplete={handleCompleteClick}
+                      onEdit={handleEditClick}
+                      onDrop={handleDrop}
+                      />
+                  </li>
+                ))}
+              </ul>
+              
+            </div>
 
-  const completedTasks = todos.filter((task) => task.isCompleted);
-  const todoTasks = todos.filter((task) => !task.isCompleted);
-
-  return (
-    <>
-      <TaskForm addNewTask={addNewTask} />
-      
-        <div className="task-board">
-        <div ref={todoDrop} className={`task-column ${isOverTodo ? 'over' : ''}`}>  
-            <h2 className="task-column-title">Todo</h2>
-            <ul className="task-list">
-              {error && <div className="error">{error}</div>}
-              {todoTasks.map((task) => (
-                <li key={task._id}>
-                  <Task
-                    task={task}
-                    onDelete={handleDelete}
-                    onComplete={handleCompleteClick}
-                    onEdit={handleEditClick}
-                    onDrop={handleDrop}
-                    />
-                </li>
-              ))}
-            </ul>
+            <div ref={completedDrop} className={`task-column ${isOverCompleted ? 'over' : ''}`}>
             
+              <h2 className="task-column-title">Completed</h2>
+              <ul className="task-list">
+                {completedTasks.map((task) => (
+                  <li key={task._id}>
+                    <Task
+                      task={task}
+                      onDelete={handleDelete}
+                      onComplete={handleCompleteClick}
+                      onEdit={handleEditClick}
+                      onDrop={handleDrop}
+                      />
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
+      </> 
+    );
+  };
 
-          <div ref={completedDrop} className={`task-column ${isOverCompleted ? 'over' : ''}`}>
-          
-            <h2 className="task-column-title">Completed</h2>
-            <ul className="task-list">
-              {completedTasks.map((task) => (
-                <li key={task._id}>
-                  <Task
-                    task={task}
-                    onDelete={handleDelete}
-                    onComplete={handleCompleteClick}
-                    onEdit={handleEditClick}
-                    onDrop={handleDrop}
-                    />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-    </> 
-  );
-};
-
-export default TaskBoard;
+  export default TaskBoard;
 
 

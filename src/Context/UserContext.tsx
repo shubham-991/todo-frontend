@@ -37,7 +37,7 @@ import { useNavigate } from "react-router-dom";
         const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
         setUser(userInfo);
 
-        if (!userInfo) history("/");
+         if (Object.keys(userInfo).length === 0) history("/");
         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [history]);
 
