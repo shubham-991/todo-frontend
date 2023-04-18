@@ -1,7 +1,6 @@
   // src/components/Todo/Todo.tsx
   import React from 'react';
   import Navbar from '../Navbar/Navbar';
-  // import Task from '../Task/Task';
   import './Todo.css';
   import TaskBoard from '../TaskBoard/TaskBoard';
   import { DndProvider } from 'react-dnd';

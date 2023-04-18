@@ -20,47 +20,22 @@ interface TaskProps {
   onDelete: (taskId: string) => void;
   onComplete: (taskId: string) => void;
   onEdit: (updatedTask: TaskData) => void;
-  onDrop: (taskId: string, isCompleted: boolean) => void;
+onDrop: (taskId: string, targetColumn: 'todo' | 'completed') => void;
 }
 
 const Task: React.FC<TaskProps> = ({ task, onDelete, onComplete,  onEdit, onDrop }) => {
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState(task.name);
   const [description, setDescription] = useState(task.description);
+  
 
-  const [{ isDragging }, drag] = useDrag<DragItem, unknown, { isDragging: boolean }>({
+ const [{ isDragging }, drag] = useDrag<DragItem, unknown, { isDragging: boolean }>({
     type: 'task',
     item: () => ({ id: task._id, type: 'task', isCompleted: task.isCompleted }),
     collect: (monitor: any) => ({
       isDragging: !!monitor.isDragging(),
     }),
   });
-
-  const [{ isOver: isOverTodo }, todoDrop] = useDrop({
-    accept: 'task',
-    drop: (item: any) => {
-      handleDrop(item.id, false);
-    },
-    canDrop: () => true,
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-    }),
-  });
-
-  const [{ isOver: isOverCompleted }, completedDrop] = useDrop({
-    accept: 'task',
-    drop: (item: any) => {
-      handleDrop(item.id, true);
-    },
-    canDrop: () => true,
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-    }),
-  });
-const handleDrop = (taskId: string, isCompleted: boolean) => {
-  onDrop(taskId, isCompleted);
-};
-
 
   const handleDeleteClick = () => {
     onDelete(task._id);
@@ -84,15 +59,8 @@ const handleDrop = (taskId: string, isCompleted: boolean) => {
   };
 
   return (
- <div
-      ref={(el) => {
-        drag(el);
-        if (!task.isCompleted) {
-          todoDrop(el);
-        } else {
-          completedDrop(el);
-        }
-      }}
+  <div
+      ref={drag}
       className={`task ${isDragging ? 'dragging' : ''} ${task.isCompleted ? 'completed' : ''}`}
     >
     <div className="task-card">

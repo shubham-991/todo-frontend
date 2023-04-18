@@ -1,5 +1,5 @@
 // src/components/Navbar/Navbar.tsx
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import './Navbar.css';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../Context/UserContext';
@@ -7,11 +7,22 @@ import { UserContext } from '../../Context/UserContext';
 const Navbar: React.FC = () => {
   const history = useNavigate();
   const { user, setUser } = useContext(UserContext);
+  const [isUserLoaded, setIsUserLoaded] = useState(false);
+
+  useEffect(() => {
+    const userInfo = localStorage.getItem("userInfo");
+    if (userInfo) {
+      setUser(JSON.parse(userInfo));
+      setIsUserLoaded(true);
+    }
+  }, [setUser]);
 
   const logoutHandler = () => {
-      localStorage.removeItem("userInfo");
-      history("/");
-  };
+  // Remove user details from localStorage
+  localStorage.removeItem("userInfo");
+  // Redirect user to home page
+  history("/");
+};
 
   return (
     <nav className="navbar">
