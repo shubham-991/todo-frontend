@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import './Signup.css';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../../Spinner/Spinner';
+import { UserContext } from '../../../Context/UserContext';
 const API_URL = process.env.REACT_APP_API_URL;
 
 
@@ -12,29 +13,30 @@ const Signup: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showSpinner, setShowSpinner] = useState(false); 
-  const history = useNavigate();
+  const navigate = useNavigate();
+  const { setUser } = useContext(UserContext);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setShowSpinner(true); 
     try {
-      const {data} = await axios.post<{ token: string }>(`${API_URL}/api/auth/signup`, {
+      const {data} = await axios.post(`${API_URL}/api/auth/signup`, {
         name,
         email,
         password,
       });
       if (data) {
-        localStorage.setItem("userInfo", JSON.stringify(data));
-        history('/todos');
+        setUser({
+          name: data.name,
+          email: data.email,
+          token: data.token,
+        });
+        navigate('/todos');
       }
-    } catch (error: any) {
-  if (error.response.status === 401) {
-    alert('Invalid email or password. Please try again.');
-  } else {
-    alert('An error occurred while logging in. Please try again later.');
-  }
-  
-}
+    } catch (error) {
+      console.error(error);
+      setError('Sign Up Failed. Please try again.');
+    }
     setShowSpinner(false);
   };
 

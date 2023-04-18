@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../../Spinner/Spinner';
+import { UserContext } from '../../../Context/UserContext';
 const API_URL = process.env.REACT_APP_API_URL;
 
 const Login: React.FC = () => {
@@ -10,7 +11,8 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showSpinner, setShowSpinner] = useState(false);
-  const history = useNavigate();
+  const navigate = useNavigate();
+  const {setUser} = useContext(UserContext);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -21,8 +23,12 @@ const Login: React.FC = () => {
         password,
       });
       if (data) {
-        localStorage.setItem("userInfo", JSON.stringify(data));
-        history('/todos');
+        setUser({
+          name: data.name,
+          email: data.email,
+          token: data.token,
+        });
+        navigate('/todos');
       }
     } catch (error) {
       console.error(error);

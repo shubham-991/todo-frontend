@@ -5,26 +5,17 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../Context/UserContext';
 
 const Navbar: React.FC = () => {
-  const history = useNavigate();
+  const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext);
-  const [isUserLoaded, setIsUserLoaded] = useState(false);
-
-  useEffect(() => {
-    const userInfo = localStorage.getItem("userInfo");
-    if (userInfo) {
-      setUser(JSON.parse(userInfo));
-      setIsUserLoaded(true);
-    }
-  }, [setUser]);
-
-  const logoutHandler = () => {
-  // Clear user context value
-  setUser(undefined);
-  // Remove user details from localStorage
-  localStorage.removeItem("userInfo");
-  // Redirect user to home page
-  history("/");
-};
+  
+   const logoutHandler = () => {
+    // Clear user context value
+    setUser(undefined);
+    // Remove user details from localStorage
+    localStorage.removeItem("userInfo");
+    // Redirect user to home page
+    navigate("/");
+  };
 
   return (
     <nav className="navbar">
