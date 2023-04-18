@@ -27,10 +27,14 @@ const Signup: React.FC = () => {
         localStorage.setItem("userInfo", JSON.stringify(data));
         history('/todos');
       }
-    } catch (error) {
-      console.error(error);
-      setError('Registration failed. Please try again.');
-    }
+    } catch (error: any) {
+  if (error.response.status === 401) {
+    alert('Invalid email or password. Please try again.');
+  } else {
+    alert('An error occurred while logging in. Please try again later.');
+  }
+  
+}
     setShowSpinner(false);
   };
 

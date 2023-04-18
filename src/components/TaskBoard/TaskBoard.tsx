@@ -39,20 +39,15 @@
           console.error(error);
           setError('Failed to fetch todos.');
         }
-      }else {
-    // Wait for the token to be available before making the request
-    const tokenCheckInterval = setInterval(() => {
-      if (user && user.token) {
-        clearInterval(tokenCheckInterval);
-        fetchTodos();
       }
-    }, 100);
-  }
       };
 
-    useEffect(() => {
-      fetchTodos();
-    }, [user]);
+      useEffect(() => {
+        if (user && user.token) {
+          fetchTodos();
+        }
+      }, [user?.token]);
+
 
     const handleDrop = async (taskId: string, targetColumn: 'todo' | 'completed') => {
       const task = todos.find((t) => t._id === taskId);

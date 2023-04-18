@@ -38,8 +38,8 @@ import { useNavigate } from "react-router-dom";
         setUser(userInfo);
 
          if (Object.keys(userInfo).length === 0) history("/");
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [history]);
+        
+      }, []);
 
     return (
       <UserContext.Provider value = {{user, setUser}}>
