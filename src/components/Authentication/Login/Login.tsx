@@ -16,13 +16,11 @@ const Login: React.FC = () => {
     event.preventDefault();
     setShowSpinner(true);
     try {
-      console.log(API_URL);
       const {data} = await axios.post(`${API_URL}/api/auth/login`, {
         email,
         password,
       });
       if (data) {
-        console.log(data);
         localStorage.setItem("userInfo", JSON.stringify(data));
         history('/todos');
       }

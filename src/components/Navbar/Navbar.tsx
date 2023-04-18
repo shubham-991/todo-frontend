@@ -18,6 +18,8 @@ const Navbar: React.FC = () => {
   }, [setUser]);
 
   const logoutHandler = () => {
+  // Clear user context value
+
   // Remove user details from localStorage
   localStorage.removeItem("userInfo");
   // Redirect user to home page
