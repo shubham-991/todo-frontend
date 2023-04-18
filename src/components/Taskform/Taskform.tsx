@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import './Taskform.css';
 import axios from 'axios';
 import { TaskData } from '../types';
 import Spinner from '../Spinner/Spinner';
+import { UserContext } from '../../Context/UserContext';
 const API_URL = process.env.REACT_APP_API_URL;
 
 
@@ -15,7 +16,8 @@ const Taskform: React.FC<TaskFormProps> = ({ addNewTask }) => {
   const [description, setDescription] = useState('');
   const [showPopup, setShowPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+  const {user} = useContext(UserContext);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -25,7 +27,7 @@ const Taskform: React.FC<TaskFormProps> = ({ addNewTask }) => {
         description
       }, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${user?.token}`
         }
       });
       if (response.data) {

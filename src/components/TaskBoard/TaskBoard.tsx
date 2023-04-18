@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
-import { DndProvider, useDrop} from 'react-dnd';
+import {useDrop} from 'react-dnd';
 import Task from '../Task/Task';
 import './TaskBoard.css';
 import { TaskData } from '../types';
 import TaskForm from '../Taskform/Taskform';
-
+import { UserContext } from '../../Context/UserContext';
 const API_URL = process.env.REACT_APP_API_URL;
 
 
@@ -18,29 +18,33 @@ const TaskBoard: React.FC = () => {
   const [todos, setTodos] = useState<TaskData[]>([]);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const {user} = useContext(UserContext);
 
   const addNewTask = (newTask: TaskData) => {
   setTodos((prevTodos) => [newTask, ...prevTodos]);
   };
 
-
-
-  useEffect(() => {
-    const fetchTodos = async () => {
+  const fetchTodos = async () => {
+    if(user && user.token){
       try {
-        const response = await axios.get<TaskData[]>(`${API_URL}/api/todos`, {
+        const config = {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${user.token}`,
           },
-        });
+        };
+        
+        const response = await axios.get<TaskData[]>(`${API_URL}/api/todos`, config);
         setTodos(response.data);
       } catch (error) {
         console.error(error);
         setError('Failed to fetch todos.');
       }
+      }
     };
+
+  useEffect(() => {
     fetchTodos();
-  }, []);
+  }, [user]);
 
   const handleDrop = async (taskId: string, targetColumn: 'todo' | 'completed') => {
     const task = todos.find((t) => t._id === taskId);
@@ -51,7 +55,7 @@ const TaskBoard: React.FC = () => {
         updatedTask,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${user?.token}`,
           },
         }
       );
@@ -68,7 +72,7 @@ const TaskBoard: React.FC = () => {
     try {
       await axios.delete(`${API_URL}/api/todos/${taskId}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${user?.token}`,
         },
       });
       const newTodos = todos.filter((task) => task._id !== taskId);
@@ -88,7 +92,7 @@ const TaskBoard: React.FC = () => {
         updatedTask,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${user?.token}`,
           },
         }
       );
@@ -104,7 +108,7 @@ const TaskBoard: React.FC = () => {
       updatedTask,
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${user?.token}`,
         },
       }
     );

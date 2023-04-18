@@ -1,51 +1,49 @@
 import {createContext, Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom";
 
-export type User = {
-  name: string,
-  email: string
-}
+  export type User = {
+    name: string,
+    email: string,
+    token : string | null;
+  }
 
-export interface UserContextInterface{
-  user : User,
-  setUser: Dispatch <SetStateAction<User>>
-}
+  export interface UserContextInterface{
+    user : User | undefined,
+    setUser: Dispatch <SetStateAction<User | undefined>>
+  }
 
-const defaultState = {
-  user : {
-    name : "",
-    email : ""
-  },
-  setUser : (user : User) => {}
-} as UserContextInterface
+  const defaultState = {
+    user : undefined,
+    setUser : (user : User | undefined) => {}
+  } as UserContextInterface;
 
-export const UserContext = createContext(defaultState)
+  export const UserContext = createContext(defaultState)
 
-type UserProvidedProps = {
-  children : ReactNode
-}
+  type UserProvidedProps = {
+    children : ReactNode
+  }
 
-export default function UserProvider( {children} : UserProvidedProps){
-    const [user, setUser] = useState<User>(() => {
-    const storedUserInfo = localStorage.getItem('userInfo');
-    if (storedUserInfo) {
-      const { name, email } = JSON.parse(storedUserInfo);
-      return { name, email };
-    } else {
-      return {
-        name : '',
-        email : ''
-      };
-    }
-  });
+  export default function UserProvider( {children} : UserProvidedProps){
+    const [user, setUser] = useState<User>();
+    const history = useNavigate();
 
-  useEffect(() => {
-    localStorage.setItem('userInfo', JSON.stringify(user));
-  }, [user]);
+    useEffect(() => {
+        if (user) {
+          localStorage.setItem("userInfo", JSON.stringify(user));
+        }
+      }, [user]);
 
+      useEffect(() => {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+        setUser(userInfo);
 
-  return (
-    <UserContext.Provider value = {{user, setUser}}>
-      {children}
-    </UserContext.Provider>
-  )
-}
+        if (!userInfo) history("/");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [history]);
+
+    return (
+      <UserContext.Provider value = {{user, setUser}}>
+        {children}
+      </UserContext.Provider>
+    )
+  }
