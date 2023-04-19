@@ -6,7 +6,7 @@ import { TaskData } from '../types';
 import './TaskModal.css';
 import { faEdit, faTrashAlt, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = 'https://todo-backend-shubham-991.onrender.com';
 
 interface DragItem {
   id: string;
