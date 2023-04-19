@@ -43,8 +43,9 @@ const Signup: React.FC = () => {
   return (
     <div className="signup">
       <h2>Sign Up</h2>
+      {error && <div className="error">{error}</div>}
       <form onSubmit={handleSubmit}>
-        {error && <div className="error">{error}</div>}
+        
         <input
           type="text"
           placeholder="Name"

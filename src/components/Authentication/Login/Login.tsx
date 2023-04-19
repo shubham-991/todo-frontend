@@ -30,16 +30,21 @@ const Login: React.FC = () => {
         });
         navigate('/todos');
       }
-    } catch (error) {
-      console.error(error);
-      setError('Login Failed. Please try again.');
+    } catch (error : any) {
+    console.error(error);
+    if (error.response && error.response.status === 401) {
+      setError('Invalid email or password. Please try again.');
+    } else {
+      setError('Login Failed. Please try again later.');
     }
+  }
     setShowSpinner(false); 
   };
 
   return (
     <div className="login">
       <h2>Login</h2>
+      {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit}>
         <input
           type="email"
